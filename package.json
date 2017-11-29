@@ -1,0 +1,30 @@
+{
+  "name": "gildedrose-refactoring-kata-nodejs",
+  "version": "1.0.0",
+  "description": "Gilded Rose Refactoring Kata in NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha spec/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jacobparra/GildedRose-Refactoring-Kata-Nodejs.git"
+  },
+  "keywords": [
+    "gilded",
+    "rose",
+    "refactoring",
+    "kata",
+    "nodejs"
+  ],
+  "author": "Jacob Parra",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jacobparra/GildedRose-Refactoring-Kata-Nodejs/issues"
+  },
+  "homepage": "https://github.com/jacobparra/GildedRose-Refactoring-Kata-Nodejs#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1"
+  }
+}
