@@ -6,7 +6,6 @@ class Item {
   }
 }
 
-
 const QUALITY_CAP_HIGH = 50;
 const QUALITY_CAP_LOW = 0;
 const QUALITY_CHANGE = 1;
@@ -15,72 +14,90 @@ const SELLIN_CHANGE = 1;
 const BACKSTAGE_PASS_FIRST_INCREASE = 10;
 const BACKSTAGE_PASS_SECOND_INCREASE = 5;
 
+class BaseItem {
+  constructor(item) {
+    this.item = item;
+  }
+  updateQuality() {}
+}
+
+class Sulfuras extends BaseItem {
+}
+class AgedBrie extends BaseItem {
+  updateQuality() {
+    if (this.item.quality < QUALITY_CAP_HIGH) {
+      this.item.quality = this.item.quality + QUALITY_CHANGE;
+    }
+    this.item.sellIn = this.item.sellIn - SELLIN_CHANGE;
+    if (this.item.sellIn < SELLIN_LIMIT) {
+      if (this.item.quality < QUALITY_CAP_HIGH) {
+        this.item.quality = this.item.quality + QUALITY_CHANGE;
+      }
+    }
+  }
+}
+class BackstagePasses extends BaseItem {
+  updateQuality() {
+    if (this.item.quality < QUALITY_CAP_HIGH) {
+      this.item.quality = this.item.quality + QUALITY_CHANGE;
+      if (this.item.sellIn <= BACKSTAGE_PASS_FIRST_INCREASE) {
+        if (this.item.quality < QUALITY_CAP_HIGH) {
+          this.item.quality = this.item.quality + QUALITY_CHANGE;
+        }
+      }
+      if (this.item.sellIn <= BACKSTAGE_PASS_SECOND_INCREASE) {
+        if (this.item.quality < QUALITY_CAP_HIGH) {
+          this.item.quality = this.item.quality + QUALITY_CHANGE;
+        }
+      }
+    }
+    this.item.sellIn = this.item.sellIn - SELLIN_CHANGE;
+    if (this.item.sellIn < SELLIN_LIMIT) {
+      this.item.quality = this.item.quality - this.item.quality;
+    }
+  }
+}
+class RegularItem extends BaseItem {
+  updateQuality() {
+    if (this.item.quality > QUALITY_CAP_LOW) {
+      this.item.quality = this.item.quality - QUALITY_CHANGE;
+    }
+    this.item.sellIn = this.item.sellIn - SELLIN_CHANGE;
+    if (this.item.sellIn < SELLIN_LIMIT) {
+      if (this.item.quality > QUALITY_CAP_LOW) {
+        this.item.quality = this.item.quality - QUALITY_CHANGE;
+      }
+    }
+  }
+}
+
 class Shop {
   constructor(items = []) {
     this.items = items;
   }
 
-  updateAgedBrie(item) {
-    if (item.quality < QUALITY_CAP_HIGH) {
-      item.quality = item.quality + QUALITY_CHANGE;
-    }
-    item.sellIn = item.sellIn - SELLIN_CHANGE;
-    if (item.sellIn < SELLIN_LIMIT) {
-      if (item.quality < QUALITY_CAP_HIGH) {
-        item.quality = item.quality + QUALITY_CHANGE;
-      }
-    }
-  }
-
-  updateBackstagePasses(item) {
-    if (item.quality < QUALITY_CAP_HIGH) {
-      item.quality = item.quality + QUALITY_CHANGE;
-      if (item.sellIn <= BACKSTAGE_PASS_FIRST_INCREASE) {
-        if (item.quality < QUALITY_CAP_HIGH) {
-          item.quality = item.quality + QUALITY_CHANGE;
-        }
-      }
-      if (item.sellIn <= BACKSTAGE_PASS_SECOND_INCREASE) {
-        if (item.quality < QUALITY_CAP_HIGH) {
-          item.quality = item.quality + QUALITY_CHANGE;
-        }
-      }
-    }
-    item.sellIn = item.sellIn - SELLIN_CHANGE;
-    if (item.sellIn < SELLIN_LIMIT) {
-      item.quality = item.quality - item.quality;
-    }
-  }
-
-  updateRegularItem(item) {
-    if (item.quality > QUALITY_CAP_LOW) {
-      item.quality = item.quality - QUALITY_CHANGE;
-    }
-    item.sellIn = item.sellIn - SELLIN_CHANGE;
-    if (item.sellIn < SELLIN_LIMIT) {
-      if (item.quality > QUALITY_CAP_LOW) {
-        item.quality = item.quality - QUALITY_CHANGE;
-      }
-    }
-  }
-
   updateQuality() {
     for (var i = 0; i < this.items.length; i++) {
       if (this.items[i].name === 'Sulfuras, Hand of Ragnaros') {
+        const item = new Sulfuras(this.items[i]);
+        item.updateQuality();
         continue;
       }
 
       if (this.items[i].name === 'Aged Brie') {
-        this.updateAgedBrie(this.items[i]);
+        const item = new AgedBrie(this.items[i]);
+        item.updateQuality();
         continue;
       }
 
       if (this.items[i].name === 'Backstage passes to a TAFKAL80ETC concert') {
-        this.updateBackstagePasses(this.items[i]);
+        const item = new BackstagePasses(this.items[i]);
+        item.updateQuality();
         continue;
       }
 
-      this.updateRegularItem(this.items[i]);
+      const item = new RegularItem(this.items[i]);
+      item.updateQuality();
     }
 
     return this.items;
