@@ -22,6 +22,9 @@ class BaseItem {
   changeQuality(number) {
     this.item.quality += number;
   }
+  resetQuality() {
+    this.item.quality = 0;
+  }
   changeSellIn(number) {
     this.item.sellIn += number;
   }
@@ -59,7 +62,7 @@ class BackstagePasses extends BaseItem {
     }
     this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
-      this.changeQuality(-this.item.quality);
+      this.resetQuality();
     }
   }
 }
