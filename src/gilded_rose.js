@@ -52,6 +52,18 @@ class Shop {
     }
   }
 
+  updateRegularItem(item) {
+    if (item.quality > QUALITY_CAP_LOW) {
+      item.quality = item.quality - QUALITY_CHANGE;
+    }
+    item.sellIn = item.sellIn - SELLIN_CHANGE;
+    if (item.sellIn < SELLIN_LIMIT) {
+      if (item.quality > QUALITY_CAP_LOW) {
+        item.quality = item.quality - QUALITY_CHANGE;
+      }
+    }
+  }
+
   updateQuality() {
     for (var i = 0; i < this.items.length; i++) {
       if (this.items[i].name === 'Sulfuras, Hand of Ragnaros') {
@@ -68,15 +80,7 @@ class Shop {
         continue;
       }
 
-      if (this.items[i].quality > QUALITY_CAP_LOW) {
-        this.items[i].quality = this.items[i].quality - QUALITY_CHANGE;
-      }
-      this.items[i].sellIn = this.items[i].sellIn - SELLIN_CHANGE;
-      if (this.items[i].sellIn < SELLIN_LIMIT) {
-        if (this.items[i].quality > QUALITY_CAP_LOW) {
-          this.items[i].quality = this.items[i].quality - QUALITY_CHANGE;
-        }
-      }
+      this.updateRegularItem(this.items[i]);
     }
 
     return this.items;
