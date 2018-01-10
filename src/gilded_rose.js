@@ -19,12 +19,14 @@ class BaseItem {
     this.item = item;
   }
   updateQuality() { }
-  changeQuality(number) {
-    if (number > 0 && this.item.quality < QUALITY_CAP_HIGH) {
+  increaseQuality(number) {
+    if (this.item.quality < QUALITY_CAP_HIGH) {
       this.item.quality += number;
     }
-    if (number < 0 && this.item.quality > QUALITY_CAP_LOW) {
-      this.item.quality += number;
+  }
+  decreaseQuality(number) {
+    if (this.item.quality > QUALITY_CAP_LOW) {
+      this.item.quality -= number;
     }
   }
   resetQuality() {
@@ -39,21 +41,21 @@ class Sulfuras extends BaseItem {
 }
 class AgedBrie extends BaseItem {
   updateQuality() {
-    this.changeQuality(QUALITY_CHANGE);
+    this.increaseQuality(QUALITY_CHANGE);
     this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
-      this.changeQuality(QUALITY_CHANGE);
+      this.increaseQuality(QUALITY_CHANGE);
     }
   }
 }
 class BackstagePasses extends BaseItem {
   updateQuality() {
-    this.changeQuality(QUALITY_CHANGE);
+    this.increaseQuality(QUALITY_CHANGE);
     if (this.item.sellIn <= BACKSTAGE_PASS_FIRST_INCREASE) {
-        this.changeQuality(QUALITY_CHANGE);
+        this.increaseQuality(QUALITY_CHANGE);
     }
     if (this.item.sellIn <= BACKSTAGE_PASS_SECOND_INCREASE) {
-        this.changeQuality(QUALITY_CHANGE);
+        this.increaseQuality(QUALITY_CHANGE);
     }
     this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
@@ -63,10 +65,10 @@ class BackstagePasses extends BaseItem {
 }
 class RegularItem extends BaseItem {
   updateQuality() {
-    this.changeQuality(-QUALITY_CHANGE);
+    this.decreaseQuality(QUALITY_CHANGE);
     this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
-      this.changeQuality(-QUALITY_CHANGE);
+      this.decreaseQuality(QUALITY_CHANGE);
     }
   }
 }
