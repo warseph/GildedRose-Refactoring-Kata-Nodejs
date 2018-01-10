@@ -20,7 +20,12 @@ class BaseItem {
   }
   updateQuality() { }
   changeQuality(number) {
-    this.item.quality += number;
+    if (number > 0 && this.item.quality < QUALITY_CAP_HIGH) {
+      this.item.quality += number;
+    }
+    if (number < 0 && this.item.quality > QUALITY_CAP_LOW) {
+      this.item.quality += number;
+    }
   }
   resetQuality() {
     this.item.quality = 0;
@@ -34,31 +39,21 @@ class Sulfuras extends BaseItem {
 }
 class AgedBrie extends BaseItem {
   updateQuality() {
-    if (this.item.quality < QUALITY_CAP_HIGH) {
-      this.changeQuality(QUALITY_CHANGE);
-    }
+    this.changeQuality(QUALITY_CHANGE);
     this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
-      if (this.item.quality < QUALITY_CAP_HIGH) {
-        this.changeQuality(QUALITY_CHANGE);
-      }
+      this.changeQuality(QUALITY_CHANGE);
     }
   }
 }
 class BackstagePasses extends BaseItem {
   updateQuality() {
-    if (this.item.quality < QUALITY_CAP_HIGH) {
-      this.changeQuality(QUALITY_CHANGE);
-      if (this.item.sellIn <= BACKSTAGE_PASS_FIRST_INCREASE) {
-        if (this.item.quality < QUALITY_CAP_HIGH) {
-          this.changeQuality(QUALITY_CHANGE);
-        }
-      }
-      if (this.item.sellIn <= BACKSTAGE_PASS_SECOND_INCREASE) {
-        if (this.item.quality < QUALITY_CAP_HIGH) {
-          this.changeQuality(QUALITY_CHANGE);
-        }
-      }
+    this.changeQuality(QUALITY_CHANGE);
+    if (this.item.sellIn <= BACKSTAGE_PASS_FIRST_INCREASE) {
+        this.changeQuality(QUALITY_CHANGE);
+    }
+    if (this.item.sellIn <= BACKSTAGE_PASS_SECOND_INCREASE) {
+        this.changeQuality(QUALITY_CHANGE);
     }
     this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
@@ -68,14 +63,10 @@ class BackstagePasses extends BaseItem {
 }
 class RegularItem extends BaseItem {
   updateQuality() {
-    if (this.item.quality > QUALITY_CAP_LOW) {
-      this.changeQuality(-QUALITY_CHANGE);
-    }
+    this.changeQuality(-QUALITY_CHANGE);
     this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
-      if (this.item.quality > QUALITY_CAP_LOW) {
-        this.changeQuality(-QUALITY_CHANGE);
-      }
+      this.changeQuality(-QUALITY_CHANGE);
     }
   }
 }
