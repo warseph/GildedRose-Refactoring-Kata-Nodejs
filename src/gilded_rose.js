@@ -18,7 +18,13 @@ class BaseItem {
   constructor(item) {
     this.item = item;
   }
-  updateQuality() {}
+  updateQuality() { }
+  changeQuality(number) {
+    this.item.quality += number;
+  }
+  changeSellIn(number) {
+    this.item.sellIn += number;
+  }
 }
 
 class Sulfuras extends BaseItem {
@@ -26,12 +32,12 @@ class Sulfuras extends BaseItem {
 class AgedBrie extends BaseItem {
   updateQuality() {
     if (this.item.quality < QUALITY_CAP_HIGH) {
-      this.item.quality = this.item.quality + QUALITY_CHANGE;
+      this.changeQuality(QUALITY_CHANGE);
     }
-    this.item.sellIn = this.item.sellIn - SELLIN_CHANGE;
+    this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
       if (this.item.quality < QUALITY_CAP_HIGH) {
-        this.item.quality = this.item.quality + QUALITY_CHANGE;
+        this.changeQuality(QUALITY_CHANGE);
       }
     }
   }
@@ -39,34 +45,52 @@ class AgedBrie extends BaseItem {
 class BackstagePasses extends BaseItem {
   updateQuality() {
     if (this.item.quality < QUALITY_CAP_HIGH) {
-      this.item.quality = this.item.quality + QUALITY_CHANGE;
+      this.changeQuality(QUALITY_CHANGE);
       if (this.item.sellIn <= BACKSTAGE_PASS_FIRST_INCREASE) {
         if (this.item.quality < QUALITY_CAP_HIGH) {
-          this.item.quality = this.item.quality + QUALITY_CHANGE;
+          this.changeQuality(QUALITY_CHANGE);
         }
       }
       if (this.item.sellIn <= BACKSTAGE_PASS_SECOND_INCREASE) {
         if (this.item.quality < QUALITY_CAP_HIGH) {
-          this.item.quality = this.item.quality + QUALITY_CHANGE;
+          this.changeQuality(QUALITY_CHANGE);
         }
       }
     }
-    this.item.sellIn = this.item.sellIn - SELLIN_CHANGE;
+    this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
-      this.item.quality = this.item.quality - this.item.quality;
+      this.changeQuality(-this.item.quality);
     }
   }
 }
 class RegularItem extends BaseItem {
   updateQuality() {
     if (this.item.quality > QUALITY_CAP_LOW) {
-      this.item.quality = this.item.quality - QUALITY_CHANGE;
+      this.changeQuality(-QUALITY_CHANGE);
     }
-    this.item.sellIn = this.item.sellIn - SELLIN_CHANGE;
+    this.changeSellIn(-SELLIN_CHANGE);
     if (this.item.sellIn < SELLIN_LIMIT) {
       if (this.item.quality > QUALITY_CAP_LOW) {
-        this.item.quality = this.item.quality - QUALITY_CHANGE;
+        this.changeQuality(-QUALITY_CHANGE);
       }
+    }
+  }
+}
+
+class ItemFactory {
+  constructor(item) {
+    this.item = item;
+  }
+  itemObject() {
+    switch (this.item.name) {
+      case 'Sulfuras, Hand of Ragnaros':
+        return new Sulfuras(this.item);
+      case 'Aged Brie':
+        return new AgedBrie(this.item);
+      case 'Backstage passes to a TAFKAL80ETC concert':
+        return new BackstagePasses(this.item);
+      default:
+        return new RegularItem(this.item);
     }
   }
 }
@@ -78,16 +102,8 @@ class Shop {
 
   updateQuality() {
     for (var i = 0; i < this.items.length; i++) {
-      let item;
-      if (this.items[i].name === 'Sulfuras, Hand of Ragnaros') {
-        item = new Sulfuras(this.items[i]);
-      } else if (this.items[i].name === 'Aged Brie') {
-        item = new AgedBrie(this.items[i]);
-      } else if (this.items[i].name === 'Backstage passes to a TAFKAL80ETC concert') {
-        item = new BackstagePasses(this.items[i]);
-      } else {
-        item = new RegularItem(this.items[i]);
-      }
+      const factory = new ItemFactory(this.items[i]);
+      const item = factory.itemObject();
       item.updateQuality();
     }
 
