@@ -78,25 +78,16 @@ class Shop {
 
   updateQuality() {
     for (var i = 0; i < this.items.length; i++) {
+      let item;
       if (this.items[i].name === 'Sulfuras, Hand of Ragnaros') {
-        const item = new Sulfuras(this.items[i]);
-        item.updateQuality();
-        continue;
+        item = new Sulfuras(this.items[i]);
+      } else if (this.items[i].name === 'Aged Brie') {
+        item = new AgedBrie(this.items[i]);
+      } else if (this.items[i].name === 'Backstage passes to a TAFKAL80ETC concert') {
+        item = new BackstagePasses(this.items[i]);
+      } else {
+        item = new RegularItem(this.items[i]);
       }
-
-      if (this.items[i].name === 'Aged Brie') {
-        const item = new AgedBrie(this.items[i]);
-        item.updateQuality();
-        continue;
-      }
-
-      if (this.items[i].name === 'Backstage passes to a TAFKAL80ETC concert') {
-        const item = new BackstagePasses(this.items[i]);
-        item.updateQuality();
-        continue;
-      }
-
-      const item = new RegularItem(this.items[i]);
       item.updateQuality();
     }
 
