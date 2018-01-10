@@ -6,69 +6,78 @@ class Item {
   }
 }
 
-const QUALITY_CAP_HIGH = 50;
-const QUALITY_CAP_LOW = 0;
-const QUALITY_CHANGE = 1;
-const SELLIN_LIMIT = 0;
-const SELLIN_CHANGE = 1;
-const BACKSTAGE_PASS_FIRST_INCREASE = 10;
-const BACKSTAGE_PASS_SECOND_INCREASE = 5;
-
 class BaseItem {
   constructor(item) {
     this.item = item;
+    this.QUALITY_CHANGE = 1;
   }
   updateQuality() { }
-  increaseQuality(number) {
+  increaseQuality() {
+    const QUALITY_CAP_HIGH = 50;
     if (this.item.quality < QUALITY_CAP_HIGH) {
-      this.item.quality += number;
+      this.item.quality += this.QUALITY_CHANGE;
     }
   }
-  decreaseQuality(number) {
+  decreaseQuality() {
+    const QUALITY_CAP_LOW = 0;
     if (this.item.quality > QUALITY_CAP_LOW) {
-      this.item.quality -= number;
+      this.item.quality -= this.QUALITY_CHANGE;
     }
   }
   resetQuality() {
     this.item.quality = 0;
   }
-  changeSellIn(number) {
-    this.item.sellIn += number;
+  decreaseSellIn() {
+    const SELLIN_CHANGE = 1;
+    this.item.sellIn -= SELLIN_CHANGE;
+  }
+  isSellInLimit() {
+    const SELLIN_LIMIT = 0;
+    return this.item.sellIn < SELLIN_LIMIT
   }
 }
 
 class Sulfuras extends BaseItem {
+  static get name() { return 'Sulfuras, Hand of Ragnaros'; }
 }
 class AgedBrie extends BaseItem {
+  static get name() { return 'Aged Brie'; }
   updateQuality() {
-    this.increaseQuality(QUALITY_CHANGE);
-    this.changeSellIn(-SELLIN_CHANGE);
-    if (this.item.sellIn < SELLIN_LIMIT) {
-      this.increaseQuality(QUALITY_CHANGE);
+    this.increaseQuality();
+    this.decreaseSellIn();
+    if (this.isSellInLimit()) {
+      this.increaseQuality();
     }
   }
 }
 class BackstagePasses extends BaseItem {
+  static get name() { return 'Backstage passes to a TAFKAL80ETC concert'; }
+  isSellInIncrease(days) {
+    return this.item.sellIn <= days;
+  }
   updateQuality() {
-    this.increaseQuality(QUALITY_CHANGE);
-    if (this.item.sellIn <= BACKSTAGE_PASS_FIRST_INCREASE) {
-        this.increaseQuality(QUALITY_CHANGE);
+    const BACKSTAGE_PASS_FIRST_INCREASE = 10;
+    const BACKSTAGE_PASS_SECOND_INCREASE = 5;
+
+    this.increaseQuality();
+    if (this.isSellInIncrease(BACKSTAGE_PASS_FIRST_INCREASE)) {
+        this.increaseQuality();
     }
-    if (this.item.sellIn <= BACKSTAGE_PASS_SECOND_INCREASE) {
-        this.increaseQuality(QUALITY_CHANGE);
+    if (this.isSellInIncrease(BACKSTAGE_PASS_SECOND_INCREASE)) {
+        this.increaseQuality();
     }
-    this.changeSellIn(-SELLIN_CHANGE);
-    if (this.item.sellIn < SELLIN_LIMIT) {
+    this.decreaseSellIn();
+    if (this.isSellInLimit()) {
       this.resetQuality();
     }
   }
 }
 class RegularItem extends BaseItem {
   updateQuality() {
-    this.decreaseQuality(QUALITY_CHANGE);
-    this.changeSellIn(-SELLIN_CHANGE);
-    if (this.item.sellIn < SELLIN_LIMIT) {
-      this.decreaseQuality(QUALITY_CHANGE);
+    this.decreaseQuality();
+    this.decreaseSellIn();
+    if (this.isSellInLimit()) {
+      this.decreaseQuality();
     }
   }
 }
@@ -79,11 +88,11 @@ class ItemFactory {
   }
   itemObject() {
     switch (this.item.name) {
-      case 'Sulfuras, Hand of Ragnaros':
+      case Sulfuras.name:
         return new Sulfuras(this.item);
-      case 'Aged Brie':
+      case AgedBrie.name:
         return new AgedBrie(this.item);
-      case 'Backstage passes to a TAFKAL80ETC concert':
+      case BackstagePasses.name:
         return new BackstagePasses(this.item);
       default:
         return new RegularItem(this.item);
